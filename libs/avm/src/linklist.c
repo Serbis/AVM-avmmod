@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "linklist.h"
+#include "../includes/linklist.h"
 
 /**
  * Реализация односвязного списка на указателях
@@ -8,7 +8,8 @@
 
 
 /**
- * Добавялет элемент в конец списка
+ * Добавялет элемент в конец списка. Элемент должен являться адресом указателя
+ * на некоторую струтуру.
  *
  * @param head указатель на указатель на вершину списоку
  * @param value значение для вставки
@@ -40,19 +41,20 @@ int LIST_Pop (Node **head) {
 }
 
 /**
- * Возврвщает указатель на элемент в списке с заданной позицией
+ * Возврвщает нетипизированный указатель на некоторый тип данных, вложенный
+ * в список
  *
  * @param head указатель на вершину списка
  * @param n номер элемента
  * @return указатель на искомый элемент
  */
-Node* LIST_Get(Node* head, int n) {
+int* LIST_Get(Node *head, int n) {
     int counter = 0;
     while (counter < n && head) {
         head = head->next;
         counter++;
     }
-    return head;
+    return ((int*) head->value);
 }
 
 
@@ -73,13 +75,34 @@ Node* LIST_GetLast(Node *head) {
 }
 
 /**
+ * Возвращает длинну списка
+ *
+ * @param head указатель на вершину списка
+ * @return длинна списка
+ */
+int LIST_Length(const Node *head) {
+    int len = 0;
+    while (head) {
+        len++;
+        head = head-> next;
+    }
+
+    return len;
+}
+
+/**
  * Добавляет элемент в начало списка
  *
  * @param head указатель на вершину списка
  * @param value значение для вставки
  */
-void LIST_Shift(Node *head, int value) {
-    Node *last = LIST_GetLast(head);
+void LIST_Shift(Node **head, int value) {
+    if (LIST_Length(*head) == 0) {
+        LIST_Push(&(*head), value);
+
+        return;
+    }
+    Node *last = LIST_GetLast(*head);
     Node *tmp = (Node*) malloc(sizeof(Node));
     tmp->value = value;
     tmp->next = NULL;
@@ -167,18 +190,3 @@ int LIST_Remove(Node **head, int n) {
     }
 }
 
-/**
- * Возвращает длинну списка
- *
- * @param head указатель на вершину списка
- * @return длинна списка
- */
-int LIST_Length(const Node *head) {
-    int len = 0;
-    while (head) {
-        len++;
-        head = head-> next;
-    }
-
-    return len;
-}

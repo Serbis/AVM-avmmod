@@ -1,3 +1,10 @@
+#ifndef AVMMOD_LINKLIST_H
+#define AVMMOD_LINKLIST_H
+
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 typedef struct Node {
     int value;
     struct Node *next;
@@ -13,3 +20,5 @@ void LIST_Insert(Node *head, unsigned n, int val);
 int LIST_Remove(Node **head, int n);
 int LIST_Length(const Node *head);
 void hello_world();
+
+#endif //AVMMOD_LINKLIST_H

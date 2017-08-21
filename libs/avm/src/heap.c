@@ -119,7 +119,7 @@ uint16_t* HEAP_Get_Free_cRef() {
 Class* HEAP_GetClass(uint16_t *cRef) {
     for (int i = 0; i < LIST_Length(classPool); i++) { //Проверяем имеется ли в пуле класс с указанным в новом потоке tid
         Class *t = ((Class*) LIST_Get(classPool, i));
-        if (t->ref == *cRef) {
+        if (*(t->ref) == *cRef) {
             return t;
         }
     }

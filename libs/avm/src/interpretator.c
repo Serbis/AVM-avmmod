@@ -1,9 +1,6 @@
 #include <stddef.h>
 #include "../includes/interpretator.h"
 
-uint8_t  currentTid = (uint8_t) 0;
-uint16_t currentARef = NULL;
-uint16_t currentCRef = NULL;
 Frame *currentFrame = NULL;
 
 /**
@@ -84,14 +81,19 @@ void INTERPRETATOR_Exec_New(uint32_t *cpPointer) {
  * @param adr
  */
 void INTERPRETATOR_Exec_Invokespetial(uint32_t adr) {
-    char *fdp = HEAP_GetClass(&currentCRef)->fdp;
+    char *fdp = HEAP_GetClass(currentFrame->cRef)->fdp;
     int16_t sigSize;
     int mAddr;
     FSS_ReadShort(&sigSize, fdp, adr);
-    FSS_ReadInt(&mAddr, fdp, adr + (uint32_t) sigSize);
+    FSS_ReadInt(&mAddr, fdp, adr + (uint32_t) sigSize + 2);
     char *sig = malloc(sizeof(char) * sigSize);
     FSS_ReadBytes(sig, fdp, adr + 2, (uint32_t) sigSize);
 
+    //Если адрес метода -1, значит в методе нет кода, выход из функции
+    if (mAddr == -1)
+        return;
+
+   идем отсюда
     //Тут находится механика взятия аргументов по сигнатуре методов. Это перспективная механика
     //поэтому код ниже закомментирован
     //int8_t * args = NULL;
@@ -123,34 +125,10 @@ void INTERPRETATOR_Exec_Invokespetial(uint32_t adr) {
     //Завершить работу метода
 }
 
-void INTERPRETATOR_Set_Current_Tid(uint8_t tid) {
-    currentTid = tid;
-}
-
-uint8_t INTERPRETATOR_Get_Current_Tid() {
-    return currentTid;
-}
-
 void INTERPRETATOR_Set_Current_Frame(Frame *frame) {
     currentFrame = frame;
 }
 
 Frame* INTERPRETATOR_Get_Current_Frame() {
     return currentFrame;
-}
-
-void INTERPRETATOR_Set_Current_ARef(uint16_t aRef) {
-    currentARef = aRef;
-}
-
-uint16_t INTERPRETATOR_Get_Current_ARef() {
-    return currentARef;
-}
-
-void INTERPRETATOR_Set_Current_CRef(uint16_t cRef) {
-    currentCRef = cRef;
-}
-
-uint16_t INTERPRETATOR_Get_Current_CRef() {
-    return currentCRef;
 }

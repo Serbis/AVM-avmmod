@@ -25,7 +25,7 @@ void LIST_Push(Node **head, int value) {
  * @param head извлекает последний элемент из списка
  * @return значение элемента
  */
-int LIST_Pop (Node **head) {
+int* LIST_Pop (Node **head) {
     Node* prev = NULL;
     int val;
     if (head == NULL) {
@@ -35,7 +35,7 @@ int LIST_Pop (Node **head) {
     val = prev->value;
     (*head) = (*head)->next;
     free(prev);
-    return val;
+    return ((int*) val);
 }
 
 /**

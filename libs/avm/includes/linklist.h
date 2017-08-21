@@ -11,7 +11,7 @@ typedef struct Node {
 } Node;
 
 void LIST_Push(Node **head, int value);
-int LIST_Pop (Node **head);
+int* LIST_Pop (Node **head);
 int * LIST_Get(Node* head, int n);
 Node* LIST_GetLast(Node *head);
 void LIST_Shift(Node **head, int value);

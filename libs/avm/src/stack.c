@@ -106,4 +106,8 @@ bool STACK_pushIntToOS(Frame *frame, uint32_t *n) {
     return TRUE;
 }
 
-bool STACK_popIntFromOS делай эту функция что бы проверить рабту пуша на стек
+uint32_t STACK_popIntFromOS(Frame *frame) {
+    uint8_t *val = (uint8_t*) LIST_Pop(&(frame->os));
+
+    return (uint32_t) ((val[0]) | (val[1] << 8) | (val[2] << 16) | (val[3] << 24));
+}

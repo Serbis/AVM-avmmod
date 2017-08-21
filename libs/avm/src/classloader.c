@@ -27,26 +27,11 @@ bool CLASSLOADER_Load(char *classFilePath, uint16_t tid, uint16_t *cRefBuf) {
         STACK_pushFrame(frame, &tid);
     }
 
-   // bytes[i] = (byte)(x >> (i * 8));
-
-    *(obj->ref) = 1000;
-    uint8_t *val = (uint8_t*) malloc(sizeof(uint8_t) * 4);
-   // uint8_t val[4] = {0};
-
-    for (int i = 0; i < 4; i++) {
-        val[i] = (uint8_t) (*(obj->ref) >> (i * 8));
-        printf("a[%d] = %d", i, val[i]);
-    }
-    int b = (int) ((val[0]) | (val[1] << 8) | (val[2] << 16) | (val[3] << 24));
-
-
+    //Разместить на OS фрейма в интепретаторе aref созданного объекта
     STACK_pushIntToOS(frame, (uint32_t *) obj->ref);
 
-
-    //obj->ref
-   // LIST_Push((Node **) frame->os, (int) val);
-    //Разместить на OS фрейма в интепретаторе aref созданного объекта
-
+    //Обновить состояние фрейма в интерпретаторе
+    INTERPRETATOR_Set_Current_Frame(frame);
 
     //Найти адрес нулевого метода
     int32_t cpSize;
@@ -55,7 +40,5 @@ bool CLASSLOADER_Load(char *classFilePath, uint16_t tid, uint16_t *cRefBuf) {
     //Выполнить инструкцию invokesptial для <clinit>()V
     INTERPRETATOR_Exec_Invokespetial((uint32_t) (CF_HEADER_SIZE + cpSize));
 
-    //Вызвать препроцессор интерпретатора, ручной запуск процесса инерпретации
-
-
+    return TRUE;
 }

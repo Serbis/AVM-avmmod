@@ -1,7 +1,34 @@
 #include <stddef.h>
 #include "../includes/interpretator.h"
 
+/** Ссылка на текущий фрейм */
 Frame *currentFrame = NULL;
+/** Флаг процессиногового останова */
+bool pStop = FALSE;
+/** Флаг препрцессингового останова */
+bool ppStop = FALSE;
+
+void INTERPRETATOR_Preprocess() {
+    while (ppStop == FALSE) {
+        pStop = FALSE;
+        INTERPRETATOR_Process();
+    }
+}
+
+void INTERPRETATOR_Process() {
+    while (pStop == FALSE) {
+
+        //Если указатель инструкции текущего фрейма указывает в никуда, завершить работу процессора и препроцессора.
+        //Данная ситуация возможна только на этапе инициализации вм, когда метод clinit пуст, его фрейм не создается
+        //и в качестве текущего фрейма остается стартовый фрейм с указателем инструкции (cia) равным NULL. Так как
+        //после статртового clinit при инициализации должен быть программно вызван main, неободимо полностью прекратить
+        //работу интерпретатора и передать управление обратно в инициализатор.
+        if (currentFrame->cia == NULL) {
+            ppStop = TRUE;
+            return;
+        }
+    }
+}
 
 /**
  * Возаращает перечень типов аргументов метода в буфер. Каждый элемент в буфере
@@ -10,7 +37,7 @@ Frame *currentFrame = NULL;
  * @param буефер для записи перечня типов аргументов
  * @param sig сигнатура метода
  */
-uint8_t INTERPRETATIR_GetMethodArgs(char * sig, int8_t* bf) {
+uint8_t INTERPRETATOR_GetMethodArgs(char * sig, int8_t* bf) {
     return 0;
     //Пока он ничего не возвращает, просто выкидывает назад 0 - нет аргументов.
 }
@@ -20,7 +47,7 @@ uint8_t INTERPRETATIR_GetMethodArgs(char * sig, int8_t* bf) {
  *
  * @param sig сигнатура метода
  */
-uint8_t INTERPRETATIR_GetMethodRetType(char * sig) {
+uint8_t INTERPRETATOR_GetMethodRetType(char * sig) {
     return TYPE_VOID;
     //Пока он возвращает только VOID.
 }
@@ -83,17 +110,16 @@ void INTERPRETATOR_Exec_New(uint32_t *cpPointer) {
 void INTERPRETATOR_Exec_Invokespetial(uint32_t adr) {
     char *fdp = HEAP_GetClass(currentFrame->cRef)->fdp;
     int16_t sigSize;
-    int mAddr;
+    int *mAddr = (int*) malloc(4);
     FSS_ReadShort(&sigSize, fdp, adr);
-    FSS_ReadInt(&mAddr, fdp, adr + (uint32_t) sigSize + 2);
+    FSS_ReadInt32(mAddr, fdp, adr + (uint32_t) sigSize + 2);
     char *sig = malloc(sizeof(char) * sigSize);
     FSS_ReadBytes(sig, fdp, adr + 2, (uint32_t) sigSize);
 
     //Если адрес метода -1, значит в методе нет кода, выход из функции
-    if (mAddr == -1)
+    if (*mAddr == -1)
         return;
 
-   идем отсюда
     //Тут находится механика взятия аргументов по сигнатуре методов. Это перспективная механика
     //поэтому код ниже закомментирован
     //int8_t * args = NULL;
@@ -110,17 +136,22 @@ void INTERPRETATOR_Exec_Invokespetial(uint32_t adr) {
     //и если они различны, то : То это перспективная механика и она требует
     //дальнейшей реализации. Если же они одентичны, то:
 
-
     //Создать новый фрейм и инициализировать его окружением для выполнения целевого метода
     //текущего инстанса
+    Frame *frame = (Frame*) malloc(sizeof(Frame));
+    frame->cRef = currentFrame->cRef;
+    frame->aRef = currentFrame->aRef;
+    frame->cia = (uint32_t *) mAddr;
 
     //Инициализировать интерпретатор новым фреймом
+    currentFrame = frame;
 
-    //Установить препроцессинговый флаг выхода из текушего блока интерпретации
+    //Установить процессинговый флаг выхода из текушего блока интерпретации
     //(интерпретатор запуска препроцессор. Если функция инерпретациии сталкивается
     // со специальным флагом, она завершает свою работа и отает управление перпроцессору
     // который тут же стартует ее по новой. Это необходимо для дублирования виртуального
     // стека, аппаратным стеком вызовов функции интепретатора.)
+    pStop = TRUE;
 
     //Завершить работу метода
 }

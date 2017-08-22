@@ -42,11 +42,20 @@ bool FSS_ReadBytes(char *bytes, char *fdp, long off, uint32_t len) {
     return TRUE;
 }
 
-bool FSS_ReadInt(int *target, char *fdp, uint32_t off) {
+bool FSS_ReadInt32(int *target, char *fdp, uint32_t off) {
     char b[4] = {0};
     FSS_ReadBytes(b, fdp, off, 4);
 
     *target = (int) ((b[0] << 24) | (b[1] << 16) | (b[2] << 8) | (b[3]));
+
+    return TRUE;
+}
+
+bool FSS_ReadUInt32(uint32_t *target, char *fdp, uint32_t off) {
+    char b[4] = {0};
+    FSS_ReadBytes(b, fdp, off, 4);
+
+    *target = (uint32_t) ((b[0] << 24) | (b[1] << 16) | (b[2] << 8) | (b[3]));
 
     return TRUE;
 }

@@ -35,7 +35,7 @@ bool CLASSLOADER_Load(char *classFilePath, uint16_t tid, uint16_t *cRefBuf) {
 
     //Найти адрес нулевого метода
     int32_t cpSize;
-    FSS_ReadInt(&cpSize, classFilePath, CF_A_CP_SIZE);
+    FSS_ReadInt32(&cpSize, classFilePath, CF_A_CP_SIZE);
 
     //Выполнить инструкцию invokesptial для <clinit>()V
     INTERPRETATOR_Exec_Invokespetial((uint32_t) (CF_HEADER_SIZE + cpSize));

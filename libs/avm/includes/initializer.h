@@ -5,6 +5,7 @@
 #include "classloader.h"
 #include "thread.h"
 #include "stack.h"
+#include "cfutils.h"
 
 void INITIALIZER_Init(char *cf, char *config);
 

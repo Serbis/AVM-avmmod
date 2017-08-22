@@ -6,6 +6,9 @@
 #include "fss.h"
 #include "../includes/heap.h"
 
+void INTERPRETATOR_Preprocess();
+void INTERPRETATOR_Process();
+
 void INTERPRETATOR_Exec_New(uint32_t *cpPointer);
 void INTERPRETATOR_Exec_Invokespetial(uint32_t adr);
 

@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     //char bf[4] = {0};
     //FSS_ReadBytes(bf,"/home/serbis/tmp/fft.avmb", 0, 4);
     //uint32_t nm = 0;
-    //FSS_ReadInt(&nm, "/home/serbis/tmp/fft.avmb", 0);
+    //FSS_ReadInt32(&nm, "/home/serbis/tmp/fft.avmb", 0);
 
 
     //Pair *p1 = (Pair*) malloc(sizeof(Pair));

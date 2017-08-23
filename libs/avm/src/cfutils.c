@@ -16,9 +16,8 @@ int32_t CFUTILS_Get_Method_By_Sig(char *sig, char *fdp) {
         char *sign = malloc(sizeof(char) * sigSize);
         FSS_ReadBytes(sign, fdp, ca + 2, (uint32_t) sigSize);
 
-        Разобраться почему адрес метода main имеет в signed int -122
         if (strcmp(sig, sign) == 0) {
-            int32_t ret = *mAddr;
+            int32_t ret = (uint32_t ) *mAddr;
             free(mAddr);
             free(sign);
 

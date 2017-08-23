@@ -15,10 +15,11 @@ void INITIALIZER_Init(char *cf, char *config) {
     //Ручной запуск необходим, поскольку инетпретатор был до этого не запущен
 
     //Найти метод main и передать ему управление
-    uint32_t mad = CFUTILS_Get_Method_By_Sig("main()V", cf);
+    int32_t mad = CFUTILS_Get_Method_By_Sig("main()V", cf);
     if (mad == -1)
         RLOGGER_log("main()V not found");
-    INTERPRETATOR_Exec_Invokespetial(mad);
+    INTERPRETATOR_Exec_Invokespetial((uint32_t) mad);
+    ну это мы доделали. Теперь вызов main, после чего перезапуск интерпретатора. При этом посмотри обязательно как с main отработает спешл
 
     //Вызвать препроцессор интерпретатора, ручной запуск процесса инерпретации
     //Тут же ручной запуск необходим потому что после выполнения <clinit>() поток вывалится из интерпретатора

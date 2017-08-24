@@ -15,6 +15,8 @@ typedef struct Frame {
     Node *os;
     /** Адррес текущей инструкции */
     uint32_t *cia;
+    /** Укахатель на родительский фрейм */
+    struct Frame *parent;
 } Frame;
 
 #endif //AVMMOD_FRAME_H

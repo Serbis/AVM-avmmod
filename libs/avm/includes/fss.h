@@ -16,8 +16,8 @@ typedef struct  FileDescriptor {
 bool FSS_Open(char *path);
 bool FSS_ReadBytes(char *bytes, char *fdp, long off, uint32_t len);
 bool FSS_ReadInt32(int32_t *target, char *fdp, uint32_t off);
-bool FSS_ReadUInt32(uint32_t *target, char *fdp, uint32_t off);
-bool FSS_ReadShort(int16_t *target, char *fdp, uint32_t off);
+bool FSS_ReadInt16(int16_t *target, char *fdp, uint32_t off);
+bool FSS_ReadInt8(int8_t *target, char *fdp, uint32_t off);
 
 #endif //AVMMOD_FSS_H
 

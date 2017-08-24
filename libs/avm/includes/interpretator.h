@@ -5,6 +5,8 @@
 #include "frame.h"
 #include "fss.h"
 #include "../includes/heap.h"
+#include "../includes/stack.h"
+
 
 void INTERPRETATOR_Preprocess();
 void INTERPRETATOR_Process();

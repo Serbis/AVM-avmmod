@@ -42,17 +42,6 @@ bool FSS_ReadBytes(char *bytes, char *fdp, long off, uint32_t len) {
     return TRUE;
 }
 
-char *int2bin(int a, char *buffer, int buf_size) {
-    buffer += (buf_size - 1);
-
-    for (int i = 31; i >= 0; i--) {
-        *buffer-- = (a & 1) + '0';
-
-        a >>= 1;
-    }
-
-    return buffer;
-}
 
 
 bool FSS_ReadInt32(int32_t *target, char *fdp, uint32_t off) {
@@ -69,20 +58,21 @@ bool FSS_ReadInt32(int32_t *target, char *fdp, uint32_t off) {
     return TRUE;
 }
 
-bool FSS_ReadUInt32(uint32_t *target, char *fdp, uint32_t off) {
-    char b[4] = {0};
-    FSS_ReadBytes(b, fdp, off, 4);
 
-    *target = (uint32_t) ((b[0] << 24) | (b[1] << 16) | (b[2] << 8) | (b[3]));
+bool FSS_ReadInt16(int16_t *target, char *fdp, uint32_t off) {
+    char b[2] = {0};
+    FSS_ReadBytes(b, fdp, off, 2);
+
+    *target = (int16_t) (((uint8_t) b[1] << 8) | ((uint8_t) b[0]));
 
     return TRUE;
 }
 
-bool FSS_ReadShort(int16_t *target, char *fdp, uint32_t off) {
-    char b[2] = {0};
-    FSS_ReadBytes(b, fdp, off, 2);
+bool FSS_ReadInt8(int8_t *target, char *fdp, uint32_t off) {
+    char b[1] = {0};
+    FSS_ReadBytes(b, fdp, off, 1);
 
-    *target = (int16_t) ((b[0] << 8) | (b[1]));
+    *target = (int8_t) b[0];
 
     return TRUE;
 }

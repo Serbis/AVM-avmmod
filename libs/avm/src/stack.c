@@ -106,8 +106,29 @@ bool STACK_pushIntToOS(Frame *frame, uint32_t *n) {
     return TRUE;
 }
 
+/**
+ * Получет значение типа int с OS фрейма из аргумента
+ *
+ * @param frame целевой фрейм
+ * @return значение
+ */
 uint32_t STACK_popIntFromOS(Frame *frame) {
     uint8_t *val = (uint8_t*) LIST_Pop(&(frame->os));
 
     return (uint32_t) ((val[0]) | (val[1] << 8) | (val[2] << 16) | (val[3] << 24));
+}
+
+/**
+ * Производит полное освобождение памяти фрейма. Особенность данной процедуры,
+ * заключена в том, что бы в начале освободить объекты созданные в хипе, а
+ * затем уже осободить память саой структуры фрейма. Объекта во фрейме,
+ * созданные на хипе при инициализации фрейма это например OS, указатель
+ * адреса текущей инструкции и т. п.
+ *
+ * @param frame целевой фрейм
+ */
+void STACK_freeFrame(Frame *frame) {
+    free(frame->cia);
+    free(frame->os);
+    free(frame);
 }

@@ -8,27 +8,6 @@ bool pStop = FALSE;
 /** Флаг препрцессингового останова */
 bool ppStop = FALSE;
 
-void INTERPRETATOR_Preprocess() {
-    while (ppStop == FALSE) {
-        pStop = FALSE;
-        INTERPRETATOR_Process();
-    }
-}
-
-void INTERPRETATOR_Process() {
-    while (pStop == FALSE) {
-
-        //Если указатель инструкции текущего фрейма указывает в никуда, завершить работу процессора и препроцессора.
-        //Данная ситуация возможна только на этапе инициализации вм, когда метод clinit пуст, его фрейм не создается
-        //и в качестве текущего фрейма остается стартовый фрейм с указателем инструкции (cia) равным NULL. Так как
-        //после статртового clinit при инициализации должен быть программно вызван main, неободимо полностью прекратить
-        //работу интерпретатора и передать управление обратно в инициализатор.
-        if (currentFrame->cia == NULL) {
-            ppStop = TRUE;
-            return;
-        }
-    }
-}
 
 /**
  * Возаращает перечень типов аргументов метода в буфер. Каждый элемент в буфере
@@ -111,7 +90,7 @@ void INTERPRETATOR_Exec_Invokespetial(uint32_t adr) {
     char *fdp = HEAP_GetClass(currentFrame->cRef)->fdp;
     int16_t sigSize;
     int *mAddr = (int*) malloc(4);
-    FSS_ReadShort(&sigSize, fdp, adr);
+    FSS_ReadInt16(&sigSize, fdp, adr);
     FSS_ReadInt32(mAddr, fdp, adr + (uint32_t) sigSize + 2);
     char *sig = malloc(sizeof(char) * sigSize);
     FSS_ReadBytes(sig, fdp, adr + 2, (uint32_t) sigSize);
@@ -142,6 +121,7 @@ void INTERPRETATOR_Exec_Invokespetial(uint32_t adr) {
     frame->cRef = currentFrame->cRef;
     frame->aRef = currentFrame->aRef;
     frame->cia = (uint32_t *) mAddr;
+    frame->parent = currentFrame;
 
     //Инициализировать интерпретатор новым фреймом
     currentFrame = frame;
@@ -154,6 +134,63 @@ void INTERPRETATOR_Exec_Invokespetial(uint32_t adr) {
     pStop = TRUE;
 
     //Завершить работу метода
+}
+
+/**
+ * Действе: Производит void выход из метода
+ * Результат: Возврат управление в родительский метод
+ * Входные данные: Отсутсвуют
+ * Механика: Устанавливает в качестве текущего фрейма (A) интерпретатора
+ *           родительский фрейм (B), после чего освобождает память занимаему
+ *           (A)
+ */
+void INTERPRETATOR_Exec_Return() {
+    //Скопировать ссылку на родительский фрейм
+    Frame *parentLink = currentFrame->parent;
+
+    //Выполнить особождение текущего фрейма
+    STACK_freeFrame(currentFrame);
+
+    //Установить родительский фрейм в качестве текущего
+    currentFrame = parentLink;
+}
+
+void INTERPRETATOR_Preprocess() {
+    while (ppStop == FALSE) {
+        pStop = FALSE;
+        INTERPRETATOR_Process();
+    }
+}
+
+void INTERPRETATOR_Process() {
+    int8_t ins = 0;
+    while (pStop == FALSE) {
+
+        //Если указатель инструкции текущего фрейма указывает в никуда, завершить работу процессора и препроцессора.
+        //Данная ситуация возможна только на этапе инициализации вм, когда метод clinit пуст, его фрейм не создается
+        //и в качестве текущего фрейма остается стартовый фрейм с указателем инструкции (cia) равным NULL. Так как
+        //после статртового clinit при инициализации должен быть программно вызван main, неободимо полностью прекратить
+        //работу интерпретатора и передать управление обратно в инициализатор.
+        if (currentFrame->cia == NULL) {
+            ppStop = TRUE;
+            return;
+        }
+
+        //Прочитать код инструкции
+        FSS_ReadInt8(&ins, HEAP_GetClass(currentFrame->cRef)->fdp, *(currentFrame->cia));
+
+        //Селектор инструкций
+        switch (ins) {
+            case (int8_t) 0xB1:
+                INTERPRETATOR_Exec_Return();
+                break;
+            default:
+                //ОШИБКА - НИЗВЕСТНАЯ ИНСТРКЦИЯ
+
+                break;
+        }
+
+    }
 }
 
 void INTERPRETATOR_Set_Current_Frame(Frame *frame) {

@@ -68,11 +68,10 @@ bool FSS_ReadInt16(int16_t *target, char *fdp, uint32_t off) {
     return TRUE;
 }
 
-bool FSS_ReadInt8(int8_t *target, char *fdp, uint32_t off) {
+int8_t FSS_ReadInt8(char *fdp, uint32_t off) {
     char b[1] = {0};
     FSS_ReadBytes(b, fdp, off, 1);
 
-    *target = (int8_t) b[0];
+    return (int8_t) b[0];
 
-    return TRUE;
 }

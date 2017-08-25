@@ -20,6 +20,7 @@ void INTERPRETATOR_Set_Current_ARef(uint16_t aRef);
 uint16_t INTERPRETATOR_Get_Current_ARef();
 void INTERPRETATOR_Set_Current_Frame(Frame *frame);
 Frame* INTERPRETATOR_Get_Current_Frame();
+void INTERPRETATOR_Set_PPStop(bool set);
 void INTERPRETATOR_Set_Current_CRef(uint16_t cRef);
 uint16_t INTERPRETATOR_Get_Current_CRef();
 

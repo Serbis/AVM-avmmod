@@ -155,6 +155,39 @@ void INTERPRETATOR_Exec_Return() {
     currentFrame = parentLink;
 }
 
+/**
+ * Действе: Размещает на OS текущего фрейма значение типа int8_t
+ *          приведя его к unsigned int
+ * Результат: Размещение значение типа int на стеке
+ * Входные данные: op - операнд типа int8_t
+ * Механика: Пробразовывет входящий операнд к int32_t и размещает его на
+ *           OS текущего фрейма
+ *
+ * @param op первый операнд
+ */
+void INTERPRETATOR_Exec_Bipush(int8_t op) {
+    int32_t *s = (int32_t) malloc(4);
+    *s = (int32_t) op;
+    STACK_pushIntToOS(currentFrame, s);
+}
+
+/**
+ * Действе: Складывает два значения на OS текущего фрейма как int и размещает
+ *          результат данной операции там же.
+ * Результат: Размещение результат целозначение сложения на OS
+ * Входные данные: Отсутсвуют
+ * Механика: Выбирает два последних значение с OS как int, складывает их и
+ *           размещает полученный резльтат как int на вершину OS
+ *
+ */
+void INTERPRETATOR_Exec_IAdd() {
+    int32_t op1 = STACK_popIntFromOS(currentFrame);
+    int32_t op2 = STACK_popIntFromOS(currentFrame);
+    int32_t *r = (int32_t) malloc(4);
+    *r = op1 + op2;
+    STACK_pushIntToOS(currentFrame, r);
+}
+
 void INTERPRETATOR_Preprocess() {
     while (ppStop == FALSE) {
         pStop = FALSE;
@@ -177,12 +210,21 @@ void INTERPRETATOR_Process() {
         }
 
         //Прочитать код инструкции
-        FSS_ReadInt8(&ins, HEAP_GetClass(currentFrame->cRef)->fdp, *(currentFrame->cia));
+        ins = FSS_ReadInt8(HEAP_GetClass(currentFrame->cRef)->fdp, *(currentFrame->cia));
 
         //Селектор инструкций
         switch (ins) {
-            case (int8_t) 0xB1:
+            case (int8_t) 0xB1: //return
+                *(currentFrame->cia) = *(currentFrame->cia) + 1;
                 INTERPRETATOR_Exec_Return();
+                break;
+            case (int8_t) 0x10: //bipush
+                *(currentFrame->cia) = *(currentFrame->cia) + 2;
+                INTERPRETATOR_Exec_Bipush(FSS_ReadInt8(HEAP_GetClass(currentFrame->cRef)->fdp, *(currentFrame->cia) - 1));
+                break;
+            case (int8_t) 0x60: //iadd
+                *(currentFrame->cia) = *(currentFrame->cia) + 1;
+                INTERPRETATOR_Exec_IAdd();
                 break;
             default:
                 //ОШИБКА - НИЗВЕСТНАЯ ИНСТРКЦИЯ
@@ -199,4 +241,8 @@ void INTERPRETATOR_Set_Current_Frame(Frame *frame) {
 
 Frame* INTERPRETATOR_Get_Current_Frame() {
     return currentFrame;
+}
+
+void INTERPRETATOR_Set_PPStop(bool set) {
+    ppStop = set;
 }

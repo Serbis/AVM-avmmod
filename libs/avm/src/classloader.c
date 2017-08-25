@@ -28,7 +28,7 @@ bool CLASSLOADER_Load(char *classFilePath, uint16_t tid, uint16_t *cRefBuf) {
     }
 
     //Разместить на OS фрейма в интепретаторе aref созданного объекта
-    STACK_pushIntToOS(frame, (uint32_t *) obj->ref);
+    STACK_pushIntToOS(frame, (int32_t*) obj->ref);
 
     //Обновить состояние фрейма в интерпретаторе
     INTERPRETATOR_Set_Current_Frame(frame);

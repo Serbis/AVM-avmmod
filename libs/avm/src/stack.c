@@ -92,12 +92,12 @@ bool STACK_pushFrame(Frame *frame, uint16_t *tRef) {
  * @param n число для размещения
  * @return  результат выполнения
  */
-bool STACK_pushIntToOS(Frame *frame, uint32_t *n) {
-    uint8_t *val = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+bool STACK_pushIntToOS(Frame *frame, int32_t *n) {
+    int8_t *val = (int8_t*) malloc(sizeof(uint8_t) * 4);
     // uint8_t val[4] = {0};
 
     for (int i = 0; i < 4; i++) {
-        val[i] = (uint8_t) (*n >> (i * 8));
+        val[i] = (int8_t) (*n >> (i * 8));
     }
 
     LIST_Shift(&(frame->os), (int) val);

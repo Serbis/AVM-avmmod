@@ -19,6 +19,6 @@ void LIST_Unshift(Node **head);
 void LIST_Insert(Node *head, unsigned n, int val);
 int LIST_Remove(Node **head, int n);
 int LIST_Length(const Node *head);
-void hello_world();
+void LIST_Free(Node *head);
 
 #endif //AVMMOD_LINKLIST_H

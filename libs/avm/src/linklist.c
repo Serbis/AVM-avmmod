@@ -188,3 +188,14 @@ int LIST_Remove(Node **head, int n) {
     }
 }
 
+/**
+ * Очищает список
+ *
+ * @param head
+ */
+void LIST_Free(Node *head) {
+    while (head->next != NULL) {
+        LIST_Pop(&head);
+    }
+}
+

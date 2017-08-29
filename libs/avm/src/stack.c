@@ -128,7 +128,13 @@ uint32_t STACK_popIntFromOS(Frame *frame) {
  * @param frame целевой фрейм
  */
 void STACK_freeFrame(Frame *frame) {
-    free(frame->cia);
+    if (frame->os != NULL)
+        LIST_Free(frame->os);
     free(frame->os);
+    frame->os = NULL;
+
+    free(frame->cia);
+    frame->cia = NULL;
+
     free(frame);
 }

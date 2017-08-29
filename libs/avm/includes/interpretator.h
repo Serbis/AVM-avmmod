@@ -6,6 +6,7 @@
 #include "fss.h"
 #include "../includes/heap.h"
 #include "../includes/stack.h"
+#include "../includes/hardm.h"
 
 
 void INTERPRETATOR_Preprocess();

@@ -10,21 +10,22 @@ Node *threadsPool = NULL;
  * @return FALSE если произошел критический сбой при добавлении потока
  */
 bool STACK_PushThread(Thread *thread) {
-    bool tExist = FALSE;
+    bool tExist = TRUE;
     for (int i = 0; i < LIST_Length(threadsPool); i++) { //Проверяем имеется ли в пуле поток с указанным в новом потоке tid
         if (((Thread*) LIST_Get(threadsPool, i))->ref == thread->ref) {
             tExist = TRUE;
         }
     }
 
-    if (tExist == TRUE) {
+    if (tExist == TRUE) { //Если tRef существуе, вывод ошибки
         char bf[] = {};
-        sprintf(bf, "Thread with ref %d already exist", thread->ref);
-        RLOGGER_log(bf);
+        sprintf(bf, "--Thread with tRef %d already exist", thread->ref);
+        STDOUT_println("xxx", 3);
         return FALSE;
     }
 
     LIST_Push(&threadsPool, (int) thread);
+    return TRUE;
 }
 
 /**
@@ -62,6 +63,10 @@ uint16_t STACK_Get_Free_Ref() {
         if (tidExist == FALSE)
             return i;
     }
+
+    //Вывод ошибки о невозможности выдачи референса
+    char bf[] = "--No available tRefs";
+    STDOUT_println(bf, sizeof(bf));
 
     return (uint16_t) -1;
 }

@@ -4,7 +4,19 @@ void INITIALIZER_Init(char *cf, char *config) {
     //Создать первичный поток
     Thread *deft = (Thread*) malloc(sizeof(Thread));
     deft->ref = STACK_Get_Free_Ref();
-    STACK_PushThread(deft);
+    if (deft->ref == -1) { //Если не удалось получить референс потока
+        char bf[] = "--Unable to initialize vm. Can't init default thread.";
+        STDOUT_println(bf, sizeof(bf));
+
+        return;
+    }
+    bool rs = STACK_PushThread(deft);
+    if (rs != TRUE) {
+        char bf[] = "--Unable to initialize vm. Can't push default thread to stack.";
+        STDOUT_println(bf, sizeof(bf));
+
+        return;
+    }
 
     //CLASSLOADER_Load - вернет сRef
     uint16_t cRef;

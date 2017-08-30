@@ -6,6 +6,8 @@
 #include "thread.h"
 #include "stack.h"
 #include "cfutils.h"
+#include "stdout.h"
+
 
 void INITIALIZER_Init(char *cf, char *config);
 

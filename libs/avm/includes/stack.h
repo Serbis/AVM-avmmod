@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include "heap.h"
 #include "thread.h"
+#include "stdout.h"
+
 
 uint16_t STACK_Get_Free_Ref();
 bool STACK_PushThread(Thread *thread);

@@ -7,7 +7,7 @@
 #include "frame.h"
 
 typedef struct thread {
-    uint16_t ref;
+    int16_t ref;
     Node *framesStack;
 } Thread;
 

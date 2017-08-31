@@ -10,8 +10,7 @@ void INITIALIZER_Init(char *cf, char *config) {
 
         return;
     }
-    bool rs = STACK_PushThread(deft);
-    if (rs != TRUE) {
+    if (STACK_PushThread(deft) == FALSE) {
         char bf[] = "--Unable to initialize vm. Can't push default thread to stack.";
         STDOUT_println(bf, sizeof(bf));
 
@@ -20,7 +19,12 @@ void INITIALIZER_Init(char *cf, char *config) {
 
     //CLASSLOADER_Load - вернет сRef
     uint16_t cRef;
-    CLASSLOADER_Load(cf, deft->ref, &cRef);
+    if (CLASSLOADER_Load(cf, deft->ref, &cRef) == FALSE) {
+        char bf[] = "--Unable to initialize vm. Can't load class.";
+        STDOUT_println(bf, sizeof(bf));
+
+        return;
+    }
 
     INTERPRETATOR_Preprocess();
     //Вызвать препроцессор интерпретатора, ручной запуск процесса инерпретации для выполнения <clinit>()
@@ -28,8 +32,11 @@ void INITIALIZER_Init(char *cf, char *config) {
 
     //Найти метод main и передать ему управление
     int32_t mad = CFUTILS_Get_Method_Cpe_By_Sig("main()V", cf);
-    if (mad == -1)
-        RLOGGER_log("main()V not found");
+    if (mad == -1) {
+        char bf[] = "--Unable to initialize vm. Method main()V not found";
+        STDOUT_println(bf, sizeof(bf));
+    }
+
     INTERPRETATOR_Exec_Invokespetial((uint32_t) mad);
 
     //Вызвать препроцессор интерпретатора, ручной запуск процесса инерпретации

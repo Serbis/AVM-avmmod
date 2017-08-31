@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include "defines.h"
 #include "linklist.h"
+#include "stdout.h"
+
 
 typedef struct  FileDescriptor {
     char *path;

@@ -16,7 +16,7 @@ bool STACK_PushThread(Thread *thread);
 Thread* STACK_GetThread(uint16_t *tRef);
 bool STACK_pushFrame(Frame *frame, uint16_t *tRef);
 bool STACK_pushIntToOS(Frame *frame, int32_t *n);
-uint32_t STACK_popIntFromOS(Frame *frame);
+int32_t STACK_popIntFromOS(Frame *frame);
 void STACK_freeFrame(Frame *frame);
 
 #endif //AVMMOD_STACK_H

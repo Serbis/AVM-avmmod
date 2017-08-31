@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "linklist.h"
 
-#define HARDM_PARMAS_M0 0
+#define HARDM_PARMAS_M0 2
 
 void HARDM_M0(Node *params);
 

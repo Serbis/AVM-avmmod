@@ -8,6 +8,8 @@
 #include "rlogger.h"
 #include "object.h"
 #include "class.h"
+#include "stdout.h"
+
 
 uint16_t* HEAP_Get_Free_aRef();
 uint16_t* HEAP_Get_Free_cRef();

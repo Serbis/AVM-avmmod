@@ -20,6 +20,10 @@ bool FSS_Open(char *path) {
         return TRUE;
     }
 
+    char bf[150];
+    sprintf(bf, "--Can not open file %s", path);
+    STDOUT_println(bf, sizeof(bf));
+
     return FALSE;
 }
 

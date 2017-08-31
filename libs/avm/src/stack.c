@@ -10,7 +10,7 @@ Node *threadsPool = NULL;
  * @return FALSE если произошел критический сбой при добавлении потока
  */
 bool STACK_PushThread(Thread *thread) {
-    bool tExist = TRUE;
+    bool tExist = FALSE;
     for (int i = 0; i < LIST_Length(threadsPool); i++) { //Проверяем имеется ли в пуле поток с указанным в новом потоке tid
         if (((Thread*) LIST_Get(threadsPool, i))->ref == thread->ref) {
             tExist = TRUE;
@@ -18,9 +18,9 @@ bool STACK_PushThread(Thread *thread) {
     }
 
     if (tExist == TRUE) { //Если tRef существуе, вывод ошибки
-        char bf[] = {};
+        char bf[50];
         sprintf(bf, "--Thread with tRef %d already exist", thread->ref);
-        STDOUT_println("xxx", 3);
+        STDOUT_println(bf, sizeof(bf));
         return FALSE;
     }
 
@@ -87,6 +87,10 @@ bool STACK_pushFrame(Frame *frame, uint16_t *tRef) {
         }
     }
 
+    char bf[50];
+    sprintf(bf, "--Thread with tRef %d does not exits", *(tRef));
+    STDOUT_println(bf, sizeof(bf));
+
     return FALSE;
 }
 
@@ -108,6 +112,9 @@ bool STACK_pushIntToOS(Frame *frame, int32_t *n) {
     LIST_Shift(&(frame->os), (int) val);
 //    int b = (int) ((val[0]) | (val[1] << 8) | (val[2] << 16) | (val[3] << 24));
 
+    //Тут должна быть проверка на достижимость максимальной глубины стека. Если
+    //превышается допустимая глубина стека, то функция должна возаращать FALSE
+
     return TRUE;
 }
 
@@ -117,7 +124,7 @@ bool STACK_pushIntToOS(Frame *frame, int32_t *n) {
  * @param frame целевой фрейм
  * @return значение
  */
-uint32_t STACK_popIntFromOS(Frame *frame) {
+int32_t STACK_popIntFromOS(Frame *frame) {
     uint8_t *val = (uint8_t*) LIST_Pop(&(frame->os));
 
     return (uint32_t) ((val[0]) | (val[1] << 8) | (val[2] << 16) | (val[3] << 24));

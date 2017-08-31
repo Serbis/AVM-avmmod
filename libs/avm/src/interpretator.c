@@ -31,6 +31,15 @@ uint8_t INTERPRETATOR_GetMethodRetType(char * sig) {
     //Пока он возвращает только VOID.
 }
 
+/**
+ * Полностью останавливает интерпретатор
+ */
+void INTERPRETATOR_Stop() {
+    ppStop = TRUE;
+    pStop = TRUE;
+}
+
+
 
 /**
  * Дествие: Создает новый объект
@@ -74,6 +83,24 @@ void INTERPRETATOR_Exec_New(uint32_t *cpPointer) {
      */
 }
 
+Node* INTERPRETATOR_ProcessHWM(int32_t pSize) {
+    Node *params = NULL;
+    if (LIST_Length(currentFrame->os) < pSize) {
+        char bf[120];
+        sprintf(bf, "--Runtime error. I->0x07, A->0x%08X, R->Insufficient operands on the OS.", *(currentFrame->cia));
+        STDOUT_println(bf, sizeof(bf));
+        INTERPRETATOR_Stop();
+        return NULL;
+    }
+    for (int i = 0; i < pSize; i++) {
+        int32_t *op = (int32_t*) malloc(4);
+        *op = STACK_popIntFromOS(currentFrame);
+        LIST_Shift(&params, (int) op);
+    }
+
+    return params;
+}
+
 /**
  * Дествие: Производит вызов аппаратого метода
  * Результат: Передает управление из виртуальной машины в код прошивки
@@ -99,15 +126,29 @@ void INTERPRETATOR_Exec_New(uint32_t *cpPointer) {
  * @param method
  */
 void INTERPRETATOR_Exec_Invokehardware(uint8_t method) {
+    Node *params = NULL;
     if (method == 0) {
         if (HARDM_PARMAS_M0 == 0)
             HARDM_M0(NULL);
-        Node *params = NULL;
-        for (int i = 0; i < HARDM_PARMAS_M0; i++) {
 
-        }
+
+
+        //1. Перенсти и прокомментировать функции ProcessHWM
+        //2. Эта же функция может возвращать NULL
+        //3. Написать обертку для возврата значений
+
+
+
+
+
+        params = INTERPRETATOR_ProcessHWM(HARDM_PARMAS_M0);
+        HARDM_M0(params);
     }
+    LIST_Free(params);
+    params = NULL;
 }
+
+
 
 /**
  * Действе: Вызывает специальный метод объекта. К специальным методам относятся
@@ -122,7 +163,17 @@ void INTERPRETATOR_Exec_Invokehardware(uint8_t method) {
  * @param adr
  */
 void INTERPRETATOR_Exec_Invokespetial(uint32_t adr) {
-    char *fdp = HEAP_GetClass(currentFrame->cRef)->fdp;
+    Class *cls = HEAP_GetClass(currentFrame->cRef);
+    if (cls == NULL) {
+        char bf[100];
+        sprintf(bf, "--Runtime error. I->0xB7, A->0x%08X, arg1->0x%08X, R->Can not get class.", (uint32_t) currentFrame->cia,  adr);
+        STDOUT_println(bf, sizeof(bf));
+        INTERPRETATOR_Stop();
+        return;
+    }
+    char *fdp = cls->fdp;
+
+
     int16_t sigSize;
     int *mAddr = (int*) malloc(4);
     FSS_ReadInt16(&sigSize, fdp, adr);
@@ -204,7 +255,12 @@ void INTERPRETATOR_Exec_Return() {
 void INTERPRETATOR_Exec_Bipush(int8_t op) {
     int32_t *s = (int32_t) malloc(4);
     *s = (int32_t) op;
-    STACK_pushIntToOS(currentFrame, s);
+    if (STACK_pushIntToOS(currentFrame, s) == FALSE) {
+        char bf[130];
+        sprintf(bf, "--Runtime error. I->0x10, A->0x%08X, R->Impossible to place the operation result on the OS.", *(currentFrame->cia));
+        STDOUT_println(bf, sizeof(bf));
+        INTERPRETATOR_Stop();
+    }
 }
 
 /**
@@ -217,11 +273,23 @@ void INTERPRETATOR_Exec_Bipush(int8_t op) {
  *
  */
 void INTERPRETATOR_Exec_IAdd() {
+    if (LIST_Length(currentFrame->os) < 2) {
+        char bf[120];
+        sprintf(bf, "--Runtime error. I->0x60, A->0x%08X, R->Insufficient operands on the OS.", *(currentFrame->cia));
+        STDOUT_println(bf, sizeof(bf));
+        INTERPRETATOR_Stop();
+        return;
+    }
     int32_t op1 = STACK_popIntFromOS(currentFrame);
     int32_t op2 = STACK_popIntFromOS(currentFrame);
     int32_t *r = (int32_t) malloc(4);
     *r = op1 + op2;
-    STACK_pushIntToOS(currentFrame, r);
+    if (STACK_pushIntToOS(currentFrame, r) == FALSE) {
+        char bf[130];
+        sprintf(bf, "--Runtime error. I->0x60, A->0x%08X, R->Impossible to place the operation result on the OS.", *(currentFrame->cia));
+        STDOUT_println(bf, sizeof(bf));
+        INTERPRETATOR_Stop();
+    }
 }
 
 void INTERPRETATOR_Preprocess() {

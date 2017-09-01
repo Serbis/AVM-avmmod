@@ -83,6 +83,12 @@ void INTERPRETATOR_Exec_New(uint32_t *cpPointer) {
      */
 }
 
+/**
+ * Вспомогательная функция для обеспечения работы инструкции invokevirtal.
+ *
+ * @param pSize количество аргуентов
+ * @return список аргументов
+ */
 Node* INTERPRETATOR_ProcessHWM(int32_t pSize) {
     Node *params = NULL;
     if (LIST_Length(currentFrame->os) < pSize) {
@@ -128,22 +134,32 @@ Node* INTERPRETATOR_ProcessHWM(int32_t pSize) {
 void INTERPRETATOR_Exec_Invokehardware(uint8_t method) {
     Node *params = NULL;
     if (method == 0) {
-        if (HARDM_PARMAS_M0 == 0)
+        if (HARDM_PARMAS_M0 == 0) {
             HARDM_M0(NULL);
-
-
-
-        //1. Перенсти и прокомментировать функции ProcessHWM
-        //2. Эта же функция может возвращать NULL
-        //3. Написать обертку для возврата значений
-
-
-
-
-
+            return;
+        }
         params = INTERPRETATOR_ProcessHWM(HARDM_PARMAS_M0);
+        if (params == NULL) return;
         HARDM_M0(params);
+    } else if (method == 1) {
+        if (HARDM_PARMAS_M1 == 0) {
+            HARDM_M1(NULL);
+            return;
+        }
+        params = INTERPRETATOR_ProcessHWM(HARDM_PARMAS_M1);
+        if (params == NULL) return;
+        HARDM_M1(params);
+    } else if (method == 2) {
+        if (HARDM_PARMAS_M2 == 0) {
+            HARDM_M2(NULL);
+            return;
+        }
+        params = INTERPRETATOR_ProcessHWM(HARDM_PARMAS_M2);
+        if (params == NULL) return;
+        HARDM_M2(params);
     }
+
+
     LIST_Free(params);
     params = NULL;
 }
@@ -166,7 +182,7 @@ void INTERPRETATOR_Exec_Invokespetial(uint32_t adr) {
     Class *cls = HEAP_GetClass(currentFrame->cRef);
     if (cls == NULL) {
         char bf[100];
-        sprintf(bf, "--Runtime error. I->0xB7, A->0x%08X, arg1->0x%08X, R->Can not get class.", (uint32_t) currentFrame->cia,  adr);
+        sprintf(bf, "--Runtime error. I->0xB7, A->0x%08X, arg1->0x%08X, R->Can not get class.", *(currentFrame->cia),  adr);
         STDOUT_println(bf, sizeof(bf));
         INTERPRETATOR_Stop();
         return;
@@ -292,6 +308,31 @@ void INTERPRETATOR_Exec_IAdd() {
     }
 }
 
+/**
+ * Действе:
+ * Результат:
+ * Механика:
+ *
+ * @param op первый операнд
+ */
+void INTERPRETATOR_Exec_If_Cmpeq(int32_t op) {
+    if (LIST_Length(currentFrame->os) < 2) {
+        char bf[120];
+        sprintf(bf, "--Runtime error. I->0xA1, A->0x%08X, R->Insufficient operands on the OS.", *(currentFrame->cia));
+        STDOUT_println(bf, sizeof(bf));
+        INTERPRETATOR_Stop();
+        return;
+    }
+
+    int32_t op1 = STACK_popIntFromOS(currentFrame);
+    int32_t op2 = STACK_popIntFromOS(currentFrame);
+    if (op1 == op2) {
+        *currentFrame->cia = (uint32_t) op;
+    }
+
+}
+
+
 void INTERPRETATOR_Preprocess() {
     while (ppStop == FALSE) {
         pStop = FALSE;
@@ -333,6 +374,13 @@ void INTERPRETATOR_Process() {
             case (int8_t) 0x07: //invokehardware
                 *(currentFrame->cia) = *(currentFrame->cia) + 2;
                 INTERPRETATOR_Exec_Invokehardware((uint8_t ) FSS_ReadInt8(HEAP_GetClass(currentFrame->cRef)->fdp, *(currentFrame->cia) - 1));
+                break;
+            case (int8_t) 0xA1: //if_icmpeq
+                *(currentFrame->cia) = *(currentFrame->cia) + 5;
+                int32_t *r = (int32_t) malloc(4);
+                FSS_ReadInt32(r, HEAP_GetClass(currentFrame->cRef)->fdp, *(currentFrame->cia) - 4);
+                INTERPRETATOR_Exec_If_Cmpeq(*r);
+                free(r);
                 break;
             default:
                 //ОШИБКА - НИЗВЕСТНАЯ ИНСТРКЦИЯ

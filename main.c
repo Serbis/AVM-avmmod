@@ -1,67 +1,104 @@
-#include "libs/avm/includes/avm.h"
-
-//typedef struct Pair {
-//    int a;
-//    int b;
-//} Pair;
-
-//void Lst(char **list) {
-//    char *e1 = *(list + 1);
-//}
+//#inc3ude "libs/avm/includes/avm.h"
+#include "libs/avm/includes/mem.h"
 
 int main(int argc, char** argv)
 {
-    /*
-     * 1. Попробовать сделать свзяный список на указателях
-     * 2. Попробовать сделать кросс-хеадерный файл
-     */
+    xmem_init();
 
-    //FSS_Open("/home/serbis/tmp/fft.avmb");
-    //char bf[4] = {0};
-    //FSS_ReadBytes(bf,"/home/serbis/tmp/fft.avmb", 0, 4);
-    //uint32_t nm = 0;
-    //FSS_ReadInt32(&nm, "/home/serbis/tmp/fft.avmb", 0);
+    printf("Free memory: %d\n", xfreeMem());
+    printf("===============================\n");
 
+    int32_t *x0 = (int32_t*) xmalloc(4);
+    *x0 = 0x11111111;
 
-    //Pair *p1 = (Pair*) malloc(sizeof(Pair));
-    //Pair *p2 = (Pair*) malloc(sizeof(Pair));
-    //Pair *p3 = (Pair*) malloc(sizeof(Pair));
+    printf("Free memory: %d\n", xfreeMem());
+    printf("===============================\n");
+    int32_t *x1 = (int32_t*) xmalloc(4);
+    *x1 = 0x22222222;
 
-    //p1->a = 11;
-    //p1->b = 12;
-    //p2->a = 21;
-    //p2->b = 22;
-    //p3->a = 31;
-    //p3->b = 32;
+    printf("Free memory: %d\n", xfreeMem());
+    printf("===============================\n");
+    int32_t *x2 = (int32_t*) xmalloc(4);
+    *x2 = 0x33333333;
 
-    //int p1p = (int) p1; //Пулить адрес указателя на указетль на структуру
-    //Pair *ap = (Pair *) (int*) p1p; //Создать указатель на струтуру по указателю на который указвает указатель
-    //int a  = ap->a;
+    char *str = (char*) xmalloc(5);
+    str[0] = 'a';
+    str[1] = 'a';
+    str[2] = 'a';
+    str[3] = 'a';
+    str[4] = 'a';
 
-
-    //Node *head = NULL;
-    //LIST_Push(&head, (int) p1); //(int) p1
-    //LIST_Shift(head, (int) p2); //(int) p2
-    //LIST_Shift(head, (int) p3); //(int) p3
-
-    //int c = LIST_Get(head, 0)->value;
-
-    AVM_Run("/home/serbis/tmp/fft.avmb", "bbb");
-
-    //Pair *pa = (Pair *) (int*) LIST_Get(head, 0);
-    //int r1 = ((Pair *) (int*) LIST_Get(head, 0)->value)->a;
-    //int r2 = ((Pair *) (int*) LIST_Get(head, 1)->value)->a;
-    //int r3 = ((Pair *) (int*) LIST_Get(head, 2)->value)->a;
-
-   // нужно упростить данный конструктив
+    printf("===============================\n");
 
 
-    //char *strArr[2];
-    //strArr[0] = "AAA";
-    //strArr[1] = "BBB";
+    //*str = 0x11111111;
 
-    //Lst(strArr);
+    //char *str = (char*) xmalloc(10);
+    //str[1] = 'b';
+    printf("--------------------------- 1\n");
 
+    xdump();
+    xmap();
+    xbmap();
+    printf("Free memory: %d\n", xfreeMem());
+    printf("Table size: %d\n", xtableSize());
+    printf("Meta size: %d\n", xmetaSize());
+    printf("Total service info size: %d\n", xtableSize() + xmetaSize());
+
+
+    printf("--------------------------- 2\n");
+
+    xfree (x0);
+    xdump();
+    xmap();
+    xbmap();
+    printf("Free memory: %d\n", xfreeMem());
+    printf("Table size: %d\n", xtableSize());
+    printf("Meta size: %d\n", xmetaSize());
+    printf("Total service info size: %d\n", xtableSize() + xmetaSize());
+
+
+    printf("--------------------------- 3\n");
+
+
+    xfree (x1);
+    xdump();
+    xmap();
+    xbmap();
+    printf("Free memory: %d\n", xfreeMem());
+    printf("Table size: %d\n", xtableSize());
+    printf("Meta size: %d\n", xmetaSize());
+    printf("Total service info size: %d\n", xtableSize() + xmetaSize());
+
+
+    printf("--------------------------- 4\n");
+
+    xfree (x2);
+    xdump();
+    xmap();
+    xbmap();
+    printf("Free memory: %d\n", xfreeMem());
+    printf("Table size: %d\n", xtableSize());
+    printf("Meta size: %d\n", xmetaSize());
+    printf("Total service info size: %d\n", xtableSize() + xmetaSize());
+
+    printf("--------------------------- 4\n");
+
+    xfree (str);
+    xdump();
+    xmap();
+    xbmap();
+    printf("Free memory: %d\n", xfreeMem());
+    printf("Table size: %d\n", xtableSize());
+    printf("Meta size: %d\n", xmetaSize());
+    printf("Total service info size: %d\n", xtableSize() + xmetaSize());
+
+    //xfree (x1);
+    //xfree (x2);
+    //xfree (str);
+    //xmalloc(4);
+    //xmalloc(4);
+    //AVM_Run("/home/serbis/tmp/fft.avmb", "bbb");
 
     return 0;
 }

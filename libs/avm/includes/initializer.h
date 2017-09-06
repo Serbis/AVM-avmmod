@@ -1,7 +1,7 @@
 #ifndef AVMMOD_INITIALIZER_H
 #define AVMMOD_INITIALIZER_H
 
-#include <stdlib.h>
+//#include <stdlib.h>
 #include "classloader.h"
 #include "thread.h"
 #include "stack.h"

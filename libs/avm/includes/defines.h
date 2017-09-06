@@ -5,6 +5,9 @@
 #ifndef AVMMOD_DEFINES_H
 #define AVMMOD_DEFINES_H
 
+/** Размер кучи виртуальной машины */
+#define HEAP_SIZE 50
+
 #define TRUE 1
 #define FALSE 0
 
